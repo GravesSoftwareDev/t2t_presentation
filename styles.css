@@ -1,0 +1,15 @@
+:root{
+  color-scheme: dark;
+  --bg-deep:#0a0818;
+  --bg-panel:#160f2e;
+  --bg-panel-2:#1d1440;
+  --ink:#eef0ff;
+  --ink-dim:#a9a3d6;
+  --black:#050308;
+  --gold:#ffd166;
+  --danger:#ff5d73;
+  --ok:#5df2a0;
+  --accent:#6c5ce7;
+  --accent-dim:#463a99;
+  font-size:16px;
+}
