@@ -1,16 +1,89 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-    <title>LVL UP: Why Getting Involved Matters"</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
-    <link rel="stylesheet" href="styles.css">
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>LVL UP: Why Getting Involved Matters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.5.2/qrcode.min.js" defer></script>
+<script src="slides.js" defer></script>
+<script src="effects.js" defer></script>
+<script src="qr.js" defer></script>
+<script src="presentation.js" defer></script>
 </head>
-<body>
-    
+<body data-part="0">
+
+<!-- Decorative background layers only, kept out of the accessibility tree -->
+<canvas id="starfield" aria-hidden="true"></canvas>
+<div id="crt-overlay" aria-hidden="true"></div>
+
+<div id="app">
+
+  <header id="hud">
+    <div class="lv-badge" id="hud-level">LV 0</div>
+    <div class="hud-part-name" id="hud-partname">TITLE SCREEN</div>
+
+    <!-- Progress bar doubles as an accessible progress indicator; the visual
+         bar fill is decorative, the real value lives on this wrapper. -->
+    <div class="xp-wrap" id="xp-wrap" role="progressbar" aria-valuemin="1" aria-label="Presentation progress">
+      <div class="xp-bar" id="xp-bar"></div>
+    </div>
+    <div class="slide-counter" id="hud-counter" aria-hidden="true">1 / 1</div>
+
+    <div class="hud-buttons">
+      <button class="icon-btn" id="btn-map" aria-expanded="false" aria-controls="quest-map" aria-label="Open quest map" title="Quest map (M)">🗺 MAP</button>
+      <button class="icon-btn" id="btn-sheet" aria-expanded="false" aria-controls="char-sheet" aria-label="Toggle character sheet" title="Character sheet (C)">🛡 STATS</button>
+      <button class="icon-btn" id="btn-sound" aria-pressed="false" aria-label="Toggle sound effects" title="Sound (S)">🔇 SFX</button>
+      <button class="icon-btn" id="btn-fx" aria-pressed="true" aria-label="Toggle visual effects and motion" title="Effects and motion (V)">✨ FX</button>
+      <button class="icon-btn" id="btn-full" aria-pressed="false" aria-label="Toggle fullscreen" title="Fullscreen (F)">⛶ FULL</button>
+    </div>
+  </header>
+
+  <div id="stage-outer">
+    <!-- Slide markup is injected here by presentation.js. aria-live announces
+         each new slide to screen readers as the presenter navigates. -->
+    <main id="stage" role="main" aria-live="polite"></main>
+  </div>
+
+  <footer id="controls">
+    <button class="dpad-btn" id="btn-prev">◀ PREV</button>
+    <p class="hint">
+      <span class="blink" aria-hidden="true">▸</span> <b>←/→</b> navigate &nbsp; <b>M</b> map &nbsp; <b>C</b> stats &nbsp; <b>F</b> fullscreen &nbsp; <b>R</b> restart
+    </p>
+    <button class="dpad-btn" id="btn-next">NEXT ▶</button>
+  </footer>
+
+</div>
+
+<aside id="char-sheet" class="collapsed" aria-label="Character sheet">
+  <div class="panel">
+    <h2 class="sheet-title">🛡 CHARACTER SHEET</h2>
+    <div id="stat-rows"></div>
+  </div>
+</aside>
+
+<!-- role="status" makes screen readers announce new achievements automatically -->
+<div id="achievement-toast" role="status" aria-live="polite">
+  <div class="ach-icon" aria-hidden="true">🏆</div>
+  <div>
+    <div class="ach-label">ACHIEVEMENT UNLOCKED</div>
+    <div class="ach-text" id="ach-text"></div>
+  </div>
+</div>
+
+<div id="levelup-flash" aria-hidden="true"><span id="levelup-text">LEVEL UP!</span></div>
+
+<!-- Level-select overlay. Hidden by default; presentation.js manages focus
+     so keyboard/screen-reader users land inside it when opened and return
+     to the MAP button when it closes. -->
+<div id="quest-map" hidden role="dialog" aria-modal="true" aria-labelledby="map-title">
+  <button class="dpad-btn map-close" id="map-close" aria-label="Close quest map">✕ CLOSE</button>
+  <h2 class="map-title" id="map-title"><span aria-hidden="true">◆</span> QUEST MAP: JUMP TO ANY SLIDE <span aria-hidden="true">◆</span></h2>
+  <div id="map-groups"></div>
+</div>
+
 </body>
 </html>

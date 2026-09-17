@@ -1,3 +1,11 @@
+/* =====================================================================
+   LVL UP presentation styles
+   Organized top to bottom in the order things appear on screen:
+   tokens -> backgrounds -> layout shell -> HUD -> stage/slide types ->
+   floating panels (character sheet, toasts, quest map) -> footer ->
+   accessibility helpers -> responsive breakpoints.
+   ===================================================================== */
+
 :root{
   color-scheme: dark;
   --bg-deep:#0a0818;
@@ -13,3 +21,521 @@
   --accent-dim:#463a99;
   font-size:16px;
 }
+/* Respect the notch/home-indicator safe areas on phones (viewport-fit=cover in index.html) */
+:root{ padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;}
+body{
+  background:var(--bg-deep);
+  color:var(--ink);
+  font-family:'VT323', monospace;
+  overflow:hidden; /* the #stage element scrolls internally, the page itself never does */
+  position:relative;
+  -webkit-font-smoothing:none; /* keeps the pixel font crisp instead of anti-aliased/blurry */
+}
+img{max-width:100%;}
+[hidden]{display:none!important;}
+
+/* Screen-reader-only text: visually hidden but still announced by assistive tech.
+   Used for slide headings that would be visually redundant next to the big
+   quote/statement text, but are still needed so screen reader users get a
+   heading to navigate to for every slide. */
+.sr-only{
+  position:absolute;
+  width:1px; height:1px;
+  padding:0; margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+}
+
+/* Visible focus ring for keyboard users. Sits outside each control's own
+   border/shadow so it stays visible against every accent color. */
+:focus-visible{
+  outline:3px solid var(--gold);
+  outline-offset:2px;
+}
+
+h1,h2,h3{ margin:0; font-weight:inherit; } /* our type classes set their own sizing, undo browser defaults */
+
+/* ---------- part accent themes ---------- */
+/* Each "level" (part of the talk) gets its own accent color, swapped by
+   toggling body[data-part] in presentation.js as the presenter navigates. */
+body[data-part="0"]{ --accent:#8a7bff; --accent-dim:#4a3fa8; }
+body[data-part="1"]{ --accent:#3ddc84; --accent-dim:#1f7a45; }
+body[data-part="2"]{ --accent:#3fa9f5; --accent-dim:#1f5c8c; }
+body[data-part="3"]{ --accent:#c07bff; --accent-dim:#6a3ca8; }
+body[data-part="4"]{ --accent:#ff8c4b; --accent-dim:#a3521f; }
+body[data-part="5"]{ --accent:#ffd166; --accent-dim:#a3821f; }
+
+.pixel-font{ font-family:'Press Start 2P', monospace; letter-spacing:0.5px; }
+
+/* ---------- background layers ---------- */
+/* Purely decorative, hidden from assistive tech via aria-hidden in the HTML. */
+#starfield{ position:fixed; inset:0; z-index:0; display:block; }
+#crt-overlay{
+  position:fixed; inset:0; z-index:50; pointer-events:none;
+  background:
+    repeating-linear-gradient(rgba(0,0,0,0) 0px, rgba(0,0,0,0) 1px, rgba(0,0,0,.18) 2px, rgba(0,0,0,0) 3px),
+    radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,.55) 100%);
+  opacity:.55;
+  animation:flicker 6s infinite steps(1);
+}
+/* body.fx-off is the manual "effects" toggle (the FX button / V key). It layers
+   on top of the OS-level prefers-reduced-motion query below so a presenter can
+   turn off motion even if their OS setting doesn't request it. */
+body.fx-off #crt-overlay{display:none;}
+@keyframes flicker{
+  0%,92%,100%{opacity:.5;}
+  93%{opacity:.62;}
+  94%{opacity:.42;}
+  96%{opacity:.58;}
+}
+
+/* ---------- layout shell ---------- */
+#app{ position:relative; z-index:1; height:100vh; height:100dvh; display:flex; flex-direction:column; }
+
+/* ---------- HUD (top bar) ---------- */
+#hud{
+  flex:0 0 auto;
+  display:flex; align-items:center; gap:.75rem;
+  padding: calc(.5rem + env(safe-area-inset-top,0px)) 1rem .5rem;
+  background:linear-gradient(180deg, rgba(5,3,8,.9), rgba(5,3,8,.55));
+  border-bottom:3px solid var(--black);
+  z-index:20;
+  flex-wrap:wrap;
+}
+.lv-badge{
+  font-family:'Press Start 2P',monospace;
+  font-size:.65rem;
+  background:var(--accent);
+  color:var(--black);
+  padding:.5rem .6rem;
+  border:3px solid var(--black);
+  box-shadow:3px 3px 0 var(--black);
+  white-space:nowrap;
+}
+.hud-part-name{
+  font-family:'Press Start 2P',monospace;
+  font-size:.6rem;
+  color:var(--ink);
+  text-shadow:2px 2px 0 var(--black);
+  white-space:nowrap;
+}
+.xp-wrap{
+  flex:1 1 160px;
+  min-width:120px;
+  height:16px;
+  background:var(--black);
+  border:2px solid var(--black);
+  outline:2px solid var(--accent-dim);
+  position:relative;
+}
+.xp-bar{
+  height:100%;
+  background:repeating-linear-gradient(90deg, var(--gold), var(--gold) 6px, #e0a92f 6px, #e0a92f 8px);
+  width:0%;
+  transition:width .35s steps(12);
+}
+.slide-counter{
+  font-family:'Press Start 2P',monospace;
+  font-size:.55rem;
+  color:var(--ink-dim);
+  white-space:nowrap;
+}
+.hud-buttons{ display:flex; gap:.4rem; margin-left:auto; flex-wrap:wrap; }
+
+/* Shared button look for every chunky pixel-bordered control in the app
+   (HUD icons, prev/next, quest map nodes/close). min-height/min-width keep
+   touch targets comfortably above the 44px accessibility guideline even
+   though the pixel font itself renders small. */
+.icon-btn, .dpad-btn, .map-node, .map-close{
+  font-family:'Press Start 2P',monospace;
+  background:var(--bg-panel);
+  color:var(--ink);
+  border:2px solid var(--black);
+  box-shadow:2px 2px 0 var(--black);
+  cursor:pointer;
+  line-height:1;
+  min-height:44px;
+  min-width:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.icon-btn{ font-size:.6rem; padding:.5rem .55rem; }
+.icon-btn:hover{ background:var(--accent-dim); }
+.icon-btn[aria-pressed="true"], .icon-btn[aria-expanded="true"]{ background:var(--accent); color:var(--black); }
+.icon-btn:active{ transform:translate(2px,2px); box-shadow:0 0 0 var(--black); }
+
+/* ---------- stage (the slide itself) ---------- */
+#stage-outer{
+  flex:1 1 auto;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:1.25rem clamp(1rem, 4vw, 3rem);
+  cursor:pointer; /* clicking anywhere advances, same convention as Slides/PowerPoint present mode */
+}
+#stage{
+  width:100%;
+  max-width:980px;
+  max-height:100%;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:.5rem;
+}
+#stage::-webkit-scrollbar{width:10px;}
+#stage::-webkit-scrollbar-thumb{background:var(--accent-dim);}
+
+.kicker{
+  font-family:'Press Start 2P',monospace;
+  font-size:.6rem;
+  color:var(--gold);
+  text-shadow:2px 2px 0 var(--black);
+  margin:0 0 .9rem;
+}
+.slide-title{
+  font-family:'Press Start 2P',monospace;
+  font-size:clamp(1.1rem, 3.4vw, 1.9rem);
+  line-height:1.5;
+  color:var(--ink);
+  text-shadow:3px 3px 0 var(--black);
+  margin:0 0 1.1rem;
+}
+.slide-body{ font-size:1.5rem; line-height:1.5; color:var(--ink); }
+
+.panel{
+  background:var(--bg-panel);
+  border:4px solid var(--accent);
+  box-shadow:0 0 0 4px var(--black), 7px 7px 0 0 rgba(0,0,0,.55);
+  padding:clamp(1rem,3vw,1.8rem);
+}
+
+.quest-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.75rem; }
+.quest-list li{
+  display:flex; gap:.7rem; align-items:flex-start;
+  font-size:1.45rem; line-height:1.4;
+}
+.quest-list .bullet{ color:var(--gold); flex:0 0 auto; font-family:'Press Start 2P',monospace; font-size:.7rem; margin-top:.35rem; }
+.quest-list.checklist .box{
+  flex:0 0 auto; width:1.6rem; height:1.6rem; margin-top:.15rem;
+  border:2px solid var(--ink-dim); display:flex; align-items:center; justify-content:center;
+  font-family:'Press Start 2P',monospace; font-size:.6rem; background:var(--bg-deep);
+}
+/* Done vs. in-progress checklist items are told apart by both the glyph
+   (check mark vs. triangle) and color, not color alone. */
+.quest-list.checklist li.done .box{ background:var(--ok); color:var(--black); border-color:var(--ok); }
+.quest-list.checklist li.active .box{ background:var(--gold); color:var(--black); border-color:var(--gold); animation:pulse 1.4s infinite; }
+@keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.5;} }
+
+/* ---- title screen ---- */
+.type-title{ text-align:center; }
+.title-glow{
+  font-family:'Press Start 2P',monospace;
+  font-size:clamp(1.4rem,5.5vw,2.6rem);
+  line-height:1.6;
+  color:var(--gold);
+  text-shadow:0 0 12px rgba(255,209,102,.6), 4px 4px 0 var(--black);
+  margin:0 0 1rem;
+}
+.title-sub{
+  font-family:'Press Start 2P',monospace;
+  font-size:clamp(.7rem,2.2vw,1rem);
+  color:var(--ink);
+  text-shadow:2px 2px 0 var(--black);
+  margin-bottom:2rem;
+}
+.title-meta{ font-size:1.4rem; color:var(--ink-dim); margin-bottom:2.2rem; }
+.blink{ animation:blink 1.1s steps(1) infinite; }
+@keyframes blink{ 50%{ opacity:0; } }
+.press-start{ font-family:'Press Start 2P',monospace; font-size:.85rem; color:var(--accent); }
+.byline{ margin-top:2.5rem; font-size:1.2rem; color:var(--ink-dim); }
+
+/* ---- section / level-card ---- */
+.type-section{ text-align:center; }
+.section-lv{
+  font-family:'Press Start 2P',monospace;
+  font-size:clamp(1rem,3vw,1.3rem);
+  color:var(--accent);
+  text-shadow:3px 3px 0 var(--black);
+  margin-bottom:.6rem;
+}
+.section-name{
+  font-family:'Press Start 2P',monospace;
+  font-size:clamp(1.6rem,6vw,3rem);
+  color:var(--ink);
+  text-shadow:4px 4px 0 var(--black);
+  margin:0 0 1.2rem;
+}
+.section-tag{ font-size:1.6rem; color:var(--gold); margin-bottom:.4rem; }
+.section-duration{
+  display:inline-block; margin-top:1.2rem;
+  font-family:'Press Start 2P',monospace; font-size:.6rem;
+  background:var(--black); color:var(--gold);
+  border:2px solid var(--gold); padding:.5rem .8rem;
+}
+.section-track{ display:flex; gap:.5rem; justify-content:center; margin-top:1.8rem; }
+.section-track span{
+  width:14px;height:14px; border:2px solid var(--black); background:var(--bg-panel-2);
+}
+.section-track span.filled{ background:var(--accent); }
+.section-track span.current{ background:var(--gold); }
+
+/* ---- hook / dialogue ---- */
+.hook-choices{ display:flex; gap:1rem; margin-top:1.6rem; flex-wrap:wrap; }
+.hook-btn{
+  flex:1 1 220px;
+  font-family:'VT323',monospace;
+  font-size:1.4rem;
+  background:var(--bg-panel-2);
+  color:var(--ink);
+  border:3px solid var(--accent);
+  box-shadow:4px 4px 0 var(--black);
+  padding:1rem 1.1rem;
+  cursor:pointer;
+  text-align:left;
+  min-height:44px;
+}
+.hook-btn:hover{ background:var(--accent-dim); }
+.hook-btn:active{ transform:translate(3px,3px); box-shadow:0 0 0 var(--black); }
+.hook-response{
+  margin-top:1.4rem; padding:1rem 1.2rem;
+  border-left:4px solid var(--gold);
+  background:rgba(255,209,102,.08);
+  font-size:1.4rem; font-style:italic;
+}
+
+.dialogue-box{ display:flex; gap:1.2rem; align-items:flex-start; }
+.dialogue-portrait{
+  flex:0 0 auto; width:4.5rem; height:4.5rem;
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.2rem;
+  background:var(--bg-panel-2); border:3px solid var(--accent);
+}
+.dialogue-name{
+  font-family:'Press Start 2P',monospace; font-size:.65rem; color:var(--gold);
+  margin-bottom:.5rem;
+}
+.dialogue-role{ font-size:1.1rem; color:var(--ink-dim); margin-bottom:.7rem; }
+.dialogue-text{ font-size:1.5rem; line-height:1.45; }
+.dialogue-next{ text-align:right; margin-top:.8rem; color:var(--accent); font-size:1.3rem; }
+
+/* ---- big statement ---- */
+.type-statement{ text-align:center; }
+.statement-text{
+  font-size:clamp(1.5rem,3.6vw,2.3rem);
+  line-height:1.5;
+  color:var(--ink);
+  border-top:3px solid var(--accent);
+  border-bottom:3px solid var(--accent);
+  padding:1.6rem 0;
+  margin:0;
+}
+.statement-note{ margin-top:1.4rem; font-size:1.2rem; color:var(--ink-dim); }
+
+/* ---- victory / achievement item slide ---- */
+.victory-trophy{ font-size:3.2rem; text-align:center; margin-bottom:.6rem; }
+.victory-sub{ text-align:center; font-size:1.5rem; color:var(--gold); margin-bottom:1.3rem; }
+.item-card{
+  margin-top:1.3rem;
+  display:flex; gap:1rem; align-items:center;
+  background:var(--bg-panel-2);
+  border:3px dashed var(--gold);
+  padding:1rem 1.2rem;
+}
+.item-icon{ font-size:2.4rem; flex:0 0 auto; filter:drop-shadow(0 0 6px rgba(255,209,102,.7)); }
+.item-title{ font-family:'Press Start 2P',monospace; font-size:.65rem; color:var(--gold); margin-bottom:.4rem; }
+.item-desc{ font-size:1.3rem; color:var(--ink); }
+
+/* ---- roster grid ---- */
+.roster{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-top:.5rem; }
+.roster-card{
+  background:var(--bg-panel-2); border:2px solid var(--accent);
+  padding:.9rem; text-align:center;
+}
+.roster-icon{ font-size:2rem; margin-bottom:.4rem; }
+.roster-role{ font-family:'Press Start 2P',monospace; font-size:.55rem; color:var(--gold); margin-bottom:.4rem; }
+.roster-name{ font-size:1.3rem; }
+
+/* ---- CTA chips ---- */
+/* These are styled like buttons but rendered as plain text (see
+   presentation.js): there is no real destination URL yet, so making them
+   focusable controls would promise an action that does nothing. Swap them
+   for real <a> tags once the actual meeting links/times are known. */
+.cta-row{ display:flex; gap:1rem; flex-wrap:wrap; margin-top:1.5rem; }
+.cta-btn{
+  font-family:'Press Start 2P',monospace; font-size:.65rem;
+  background:var(--accent); color:var(--black);
+  border:3px solid var(--black);
+  box-shadow:4px 4px 0 var(--black);
+  padding:.9rem 1.1rem;
+}
+
+/* ---- LinkedIn card (final slide) ---- */
+.linkedin-card{
+  margin-top:1.6rem;
+  display:flex; flex-direction:column; align-items:center; gap:1rem;
+}
+.qr-wrap{
+  /* White background regardless of theme: QR scanners need strong
+     contrast, so this stays light even though the rest of the page is dark. */
+  background:#ffffff;
+  padding:.75rem;
+  border:4px solid var(--accent);
+  box-shadow:0 0 0 4px var(--black), 7px 7px 0 0 rgba(0,0,0,.55);
+}
+.linkedin-qr{ display:block; width:160px; height:160px; }
+.linkedin-qr svg{ display:block; width:100%; height:100%; } /* the generated QR code fills its container */
+.qr-caption{
+  font-family:'Press Start 2P',monospace; font-size:.5rem;
+  color:var(--black); text-align:center; margin:.6rem 0 0;
+}
+.linkedin-link{
+  font-family:'Press Start 2P',monospace; font-size:.65rem;
+  background:var(--accent); color:var(--black);
+  border:3px solid var(--black);
+  box-shadow:4px 4px 0 var(--black);
+  padding:.9rem 1.1rem;
+  text-decoration:none;
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:44px;
+}
+.linkedin-link:hover{ background:var(--gold); }
+.linkedin-link:active{ transform:translate(3px,3px); box-shadow:0 0 0 var(--black); }
+
+/* ---------- character sheet (floating stat panel) ---------- */
+#char-sheet{
+  position:fixed; top:4.2rem; right:1rem; z-index:30;
+  width:250px; max-width:calc(100vw - 2rem);
+  transition:transform .25s ease;
+}
+#char-sheet.collapsed{ transform:translateX(calc(100% + 1rem)); }
+.sheet-title{ font-family:'Press Start 2P',monospace; font-size:.6rem; color:var(--gold); margin-bottom:.8rem; }
+.stat-row{ margin-bottom:.65rem; }
+.stat-label{ display:flex; justify-content:space-between; font-size:1.1rem; margin-bottom:.2rem; }
+.stat-pips{ display:flex; gap:3px; }
+.stat-pips span{ flex:1; height:10px; background:var(--bg-deep); border:1px solid var(--accent-dim); }
+.stat-pips span.on{ background:var(--accent); }
+
+/* ---------- achievement toast ---------- */
+#achievement-toast{
+  position:fixed; top:5rem; left:50%; transform:translateX(-50%) translateY(-20px);
+  z-index:60; opacity:0; pointer-events:none;
+  transition:opacity .3s ease, transform .3s ease;
+  background:var(--black); border:3px solid var(--gold);
+  box-shadow:5px 5px 0 rgba(0,0,0,.6);
+  padding:.8rem 1.2rem; display:flex; gap:.8rem; align-items:center;
+  max-width:90vw;
+}
+#achievement-toast.show{ opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+.ach-icon{ font-size:1.8rem; }
+.ach-label{ font-family:'Press Start 2P',monospace; font-size:.55rem; color:var(--gold); margin-bottom:.3rem; }
+.ach-text{ font-size:1.2rem; color:var(--ink); }
+
+/* ---------- level up flash ---------- */
+#levelup-flash{
+  position:fixed; inset:0; z-index:70; pointer-events:none;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,0); opacity:0;
+}
+#levelup-flash.play{
+  animation:flashpop .9s ease forwards;
+}
+#levelup-flash span{
+  font-family:'Press Start 2P',monospace; font-size:clamp(1.5rem,6vw,3rem);
+  color:var(--gold); text-shadow:4px 4px 0 var(--black);
+  transform:scale(.5); opacity:0;
+}
+#levelup-flash.play span{ animation:textpop .9s ease forwards; }
+@keyframes flashpop{
+  0%{ background:rgba(255,255,255,0); opacity:1; }
+  15%{ background:rgba(255,255,255,.85); }
+  30%{ background:rgba(0,0,0,.75); }
+  85%{ background:rgba(0,0,0,.75); }
+  100%{ background:rgba(0,0,0,0); opacity:0; }
+}
+@keyframes textpop{
+  0%{ transform:scale(.3); opacity:0; }
+  20%{ transform:scale(1.15); opacity:1; }
+  30%{ transform:scale(1); opacity:1; }
+  85%{ transform:scale(1); opacity:1; }
+  100%{ transform:scale(1); opacity:0; }
+}
+
+/* ---------- quest map (level-select overlay) ---------- */
+#quest-map{
+  position:fixed; inset:0; z-index:80;
+  background:rgba(5,3,8,.96);
+  padding:2rem clamp(1rem,4vw,3rem);
+  overflow-y:auto;
+}
+.map-title{ font-family:'Press Start 2P',monospace; font-size:1rem; color:var(--gold); margin-bottom:1.5rem; text-align:center; }
+.map-group{ margin-bottom:1.6rem; }
+.map-group h3{
+  font-family:'Press Start 2P',monospace; font-size:.65rem; color:var(--accent);
+  border-bottom:2px solid var(--accent-dim); padding-bottom:.5rem; margin-bottom:.7rem;
+}
+.map-nodes{ display:flex; flex-wrap:wrap; gap:.6rem; }
+.map-node{
+  font-family:'VT323',monospace; font-size:1.2rem;
+  background:var(--bg-panel-2); border:2px solid var(--accent-dim);
+  color:var(--ink); padding:.5rem .8rem;
+}
+.map-node:hover{ border-color:var(--accent); background:var(--accent-dim); }
+.map-node.current{ background:var(--gold); color:var(--black); border-color:var(--gold); }
+.map-close{ position:fixed; top:1rem; right:1rem; font-size:.6rem; padding:.5rem .55rem; }
+
+/* ---------- footer controls ---------- */
+#controls{
+  flex:0 0 auto; z-index:20;
+  display:flex; align-items:center; justify-content:space-between; gap:1rem;
+  padding:.7rem 1rem calc(.7rem + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(0deg, rgba(5,3,8,.9), rgba(5,3,8,.55));
+  border-top:3px solid var(--black);
+}
+.dpad-btn{ font-size:.75rem; padding:.7rem 1.1rem; }
+.dpad-btn:hover{ background:var(--accent-dim); }
+.dpad-btn:active{ transform:translate(3px,3px); box-shadow:0 0 0 var(--black); }
+.dpad-btn:disabled{ opacity:.3; cursor:default; }
+.hint{ font-size:1.05rem; color:var(--ink-dim); text-align:center; flex:1; margin:0; }
+.hint b{ color:var(--accent); }
+
+/* ---------- responsive: phones and small tablets ---------- */
+@media (max-width:700px){
+  .hint{ display:none; } /* keyboard hints are not relevant on touch */
+  #char-sheet{ width:200px; top:auto; bottom:5rem; right:.5rem; }
+  .hud-part-name{ display:none; } /* the LV badge + progress bar already say enough */
+  .dialogue-box{ flex-direction:column; align-items:center; text-align:center; }
+  .qr-wrap{ display:none; } /* scanning a code on the same phone you're viewing it on doesn't work */
+}
+
+@media (max-width:420px){
+  /* Very narrow phones: tighten padding so the HUD buttons do not force
+     three wrapped rows above the slide content. */
+  .icon-btn{ padding:.45rem .5rem; font-size:.55rem; }
+  .lv-badge{ font-size:.55rem; padding:.45rem .5rem; }
+  #hud{ gap:.5rem; }
+}
+
+/* ---------- reduced motion ---------- */
+/* Two ways to land here: the OS-level "reduce motion" accessibility setting,
+   or the presenter manually switching off effects with the FX button / V key
+   (that adds body.fx-off, handled by the individual rules above and below). */
+@media (prefers-reduced-motion: reduce){
+  #crt-overlay{ animation:none; opacity:.4; }
+  .blink{ animation:none; opacity:1; }
+  .quest-list.checklist li.active .box{ animation:none; }
+  .xp-bar{ transition:none; }
+  #achievement-toast{ transition:opacity .3s ease; transform:translateX(-50%); }
+  #achievement-toast.show{ transform:translateX(-50%); }
+  #levelup-flash.play, #levelup-flash.play span{ animation:none; }
+}
+body.fx-off .blink{ animation:none; opacity:1; }
+body.fx-off .quest-list.checklist li.active .box{ animation:none; }
+body.fx-off #achievement-toast{ transition:opacity .3s ease; transform:translateX(-50%); }
+body.fx-off #achievement-toast.show{ transform:translateX(-50%); }
