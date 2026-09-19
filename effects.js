@@ -100,3 +100,48 @@ function loadState(){
     }
   }catch(e){}
 }
+
+/* ---------- starfield background ---------- */
+// Draws one static frame instead of looping when prefersReducedMotion() is
+// true, so it stops animating without needing a separate code path.
+
+function initStarfield(){
+  const canvas = document.getElementById('starfield');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+
+  function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const count = Math.floor((canvas.width*canvas.height)/9000);
+    stars = new Array(count).fill(0).map(()=>({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      r: Math.random()*1.6+0.3,
+      s: Math.random()*0.25+0.03,
+      tw: Math.random()*Math.PI*2
+    }));
+  }
+  function draw(){
+    const reduceMotion = prefersReducedMotion();
+    ctx.fillStyle = '#0a0818';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    for(const star of stars){
+      let alpha;
+      if(reduceMotion){
+        alpha = 0.4; // fixed brightness, no twinkle
+      } else {
+        star.tw += 0.02;
+        alpha = 0.4 + Math.sin(star.tw)*0.35;
+        star.y += star.s;
+        if(star.y > canvas.height){ star.y = 0; star.x = Math.random()*canvas.width; }
+      }
+      ctx.fillStyle = 'rgba(238,240,255,'+Math.max(0.05,alpha)+')';
+      ctx.fillRect(star.x, star.y, star.r, star.r);
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+  draw();
+}
