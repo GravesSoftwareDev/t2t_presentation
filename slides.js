@@ -1,3 +1,14 @@
+/* =====================================================================
+   Presentation content.
+
+   OUTLINE mirrors the talk's actual outline: one entry per part of the
+   talk, each with a list of "moments" (one moment = one slide's worth of
+   content). presentation.js turns this into the actual slide deck.
+
+   A moment only needs a "type" when it uses one of the special layouts
+   (title, hook, statement, victory, roster, dialogue, cta, final). Leave
+   "type" off and it renders as a normal kicker/title/bullets slide.
+   ===================================================================== */
 
 const OUTLINE = [
 
@@ -207,4 +218,16 @@ const OUTLINE = [
     ]
   },
 
+];
+
+const PART_NAMES = {
+  0:'TITLE SCREEN', 1:'TECH2GETHER', 2:'SPACE TECHS', 3:'PTK', 4:'SGF DEVS', 5:'VICTORY'
+};
+
+const STATS = [
+  {key:'LEAD', label:'LEADERSHIP', icon:'⚔', max:5},
+  {key:'RES',  label:'RESILIENCE', icon:'🛡', max:5},
+  {key:'RSC',  label:'RESEARCH',   icon:'🔍', max:5},
+  {key:'COM',  label:'COMMUNITY',  icon:'🤝', max:5},
+  {key:'VIS',  label:'VISION',     icon:'🔭', max:5},
 ];
