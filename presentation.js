@@ -449,6 +449,8 @@ document.addEventListener('keydown', function(e){
       toggleSheet(); break;
     case 'f': case 'F':
       toggleFullscreen(); break;
+    case 'n': case 'N':
+      btnMusic.click(); break;
     case 's': case 'S':
       btnSound.click(); break;
     case 'v': case 'V':

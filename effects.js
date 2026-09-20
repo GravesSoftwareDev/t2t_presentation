@@ -46,6 +46,22 @@ btnSound.addEventListener('click', function(){
   if(soundOn) playBeep(880,0.08);
 });
 
+/* ---------- background music ---------- */
+
+const btnMusic = document.getElementById('btn-music');
+const bgMusic = document.getElementById('bg-music');
+// Off until the user clicks it on, like the SFX button. The click is the
+// user gesture browsers require before audio can play.
+let musicOn = false;
+bgMusic.volume = 0.3;
+
+btnMusic.addEventListener('click', function(){
+  musicOn = !musicOn;
+  this.setAttribute('aria-pressed', String(musicOn));
+  this.textContent = musicOn ? '🎵 MUSIC' : '🔇 MUSIC';
+  if(musicOn) bgMusic.play().catch(()=>{}); else bgMusic.pause();
+});
+
 /* ---------- effects / motion toggle ---------- */
 
 btnFx.addEventListener('click', function(){

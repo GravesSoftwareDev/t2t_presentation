@@ -37,6 +37,7 @@
     <div class="hud-buttons">
       <button class="icon-btn" id="btn-map" aria-expanded="false" aria-controls="quest-map" aria-label="Open quest map" title="Quest map (M)">🗺 MAP</button>
       <button class="icon-btn" id="btn-sheet" aria-expanded="false" aria-controls="char-sheet" aria-label="Toggle character sheet" title="Character sheet (C)">🛡 STATS</button>
+      <button class="icon-btn" id="btn-music" aria-pressed="false" aria-label="Toggle background music" title="Music (N)">🔇 MUSIC</button>
       <button class="icon-btn" id="btn-sound" aria-pressed="false" aria-label="Toggle sound effects" title="Sound (S)">🔇 SFX</button>
       <button class="icon-btn" id="btn-fx" aria-pressed="true" aria-label="Toggle visual effects and motion" title="Effects and motion (V)">✨ FX</button>
       <button class="icon-btn" id="btn-full" aria-pressed="false" aria-label="Toggle fullscreen" title="Fullscreen (F)">⛶ FULL</button>
@@ -52,7 +53,7 @@
   <footer id="controls">
     <button class="dpad-btn" id="btn-prev">◀ PREV</button>
     <p class="hint">
-      <span class="blink" aria-hidden="true">▸</span> <b>←/→</b> navigate &nbsp; <b>M</b> map &nbsp; <b>C</b> stats &nbsp; <b>F</b> fullscreen &nbsp; <b>R</b> restart
+      <span class="blink" aria-hidden="true">▸</span> <b>←/→</b> navigate &nbsp; <b>M</b> map &nbsp; <b>C</b> stats &nbsp; <b>F</b> fullscreen &nbsp; <b>N</b> music &nbsp; <b>R</b> restart
     </p>
     <button class="dpad-btn" id="btn-next">NEXT ▶</button>
   </footer>
@@ -74,6 +75,8 @@
     <div class="ach-text" id="ach-text"></div>
   </div>
 </div>
+
+<audio id="bg-music" src="moodmode-8-bit-arcade-mode-158814.mp3" loop preload="auto"></audio>
 
 <div id="levelup-flash" aria-hidden="true"><span id="levelup-text">LEVEL UP!</span></div>
 
