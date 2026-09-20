@@ -37,7 +37,6 @@ const OUTLINE = [
         type:'statement', kicker:'THE THESIS',
         title:'The Frame',
         statement:'Involvement isn’t a resume line. It’s how you actually build the skills, the network, and the confidence that get you where you want to go.',
-        note:'Frame the thesis before diving into the four campaigns.',
       },
     ]
   },
@@ -163,7 +162,6 @@ const OUTLINE = [
       {
         type:'statement', kicker:'PLOT TWIST', title:'The Flip Side',
         statement:'Everything so far is why involvement matters to me. Honors in Action is me researching why other students don’t get there.',
-        note:'This grounds the talk in real research, not just anecdote. It gives data-backed credibility, not just my personal story.',
       },
     ]
   },
@@ -193,7 +191,7 @@ const OUTLINE = [
       {
         type:'statement', kicker:'THE POINT', title:'The Point',
         statement:'My OTC involvement wasn’t separate from my professional path. It built the path.',
-        note:'Keeping the focus on how campus leadership translated into being taken seriously in a professional community (not over-explaining Cold Brew Code here).',
+        
       },
     ]
   },
