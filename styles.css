@@ -256,6 +256,20 @@ body.fx-off #crt-overlay{display:none;}
 .press-start{ font-family:'Press Start 2P',monospace; font-size:.85rem; color:var(--accent); }
 .byline{ margin-top:2.5rem; font-size:1.2rem; color:var(--ink-dim); }
 
+/* ---- follow-along link + QR (title slide, fullscreen only) ---- */
+.follow-along{
+  display:none;
+  margin-top:1.5rem;
+  align-items:center; justify-content:center; gap:1.5rem;
+}
+:fullscreen .follow-along{ display:flex; }
+.follow-text{
+  font-family:'Press Start 2P',monospace; font-size:.7rem; line-height:2;
+  margin:0; text-align:left;
+}
+.follow-text b{ color:var(--accent); font-weight:normal; font-size:.85rem; }
+.follow-along .qr-wrap{ display:block; } /* overrides the small-screen hide; the wrapper is already fullscreen-only */
+
 /* ---- section / level-card ---- */
 .type-section{ text-align:center; }
 .section-lv{

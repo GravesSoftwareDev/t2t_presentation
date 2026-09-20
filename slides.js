@@ -23,6 +23,7 @@ const OUTLINE = [
         subtitle:'( MORE THAN YOU THINK )',
         meta:'TECH2GETHER &middot; SEPT 23, 2026 &middot; RUN TIME ~30&ndash;45 MIN',
         byline:'A TALK BY SHANNA GRAVES',
+        followUrl:'https://getinvolved-t2t.gravessoftware.dev',
       },
       {
         type:'hook', kicker:'QUEST GIVER APPROACHES',

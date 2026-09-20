@@ -117,6 +117,14 @@ function slideBodyHTML(sl){
         '<p class="title-meta">'+sl.meta+'</p>'+
         '<p class="press-start blink" aria-hidden="true">&#9654; PRESS START (or click below) &#9654;</p>'+
         '<p class="byline">'+sl.byline+'</p>'+
+        // Only visible in fullscreen (see styles.css): that's when the deck is
+        // being projected and the audience can scan along on their phones.
+        '<div class="follow-along">'+
+          '<p class="follow-text">FOLLOW ALONG AT<br><b>getinvolved-t2t.gravessoftware.dev</b></p>'+
+          '<div class="qr-wrap">'+
+            '<div id="follow-qr" class="linkedin-qr" role="img" aria-label="QR code that opens the presentation on your phone"></div>'+
+          '</div>'+
+        '</div>'+
         '</div>'
       );
     case 'section':
@@ -264,6 +272,9 @@ function render(){
   stage.innerHTML = slideBodyHTML(sl);
   stage.scrollTop = 0;
 
+  if(sl.type === 'title' && sl.followUrl){
+    renderQR('follow-qr', sl.followUrl);
+  }
   if(sl.type === 'final'){
     renderQR('linkedin-qr', sl.linkedin);
   }
