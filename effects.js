@@ -1,3 +1,11 @@
+/* =====================================================================
+   Effects: sound, motion, fullscreen, touch, and saving your place.
+   Nothing in this file needs to know about slide content. next() and
+   prev() (used by the swipe handlers below) are defined in
+   presentation.js, which loads after this file, but that's fine since
+   they're only looked up when a swipe actually happens, not right now.
+   ===================================================================== */
+
 const btnSound = document.getElementById('btn-sound');
 const btnFx = document.getElementById('btn-fx');
 const btnFull = document.getElementById('btn-full');
