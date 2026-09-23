@@ -525,6 +525,7 @@ body.fx-off #crt-overlay{display:none;}
   #char-sheet{ width:200px; top:auto; bottom:5rem; right:.5rem; }
   .hud-part-name{ display:none; } /* the LV badge + progress bar already say enough */
   .dialogue-box{ flex-direction:column; align-items:center; text-align:center; }
+   #btn-full{display:none;} /* hide full screen btn on movile devices */
   .qr-wrap{ display:none; } /* scanning a code on the same phone you're viewing it on doesn't work */
 }
 
