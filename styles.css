@@ -464,6 +464,7 @@ body.fx-off #crt-overlay{display:none;}
   font-family:'Press Start 2P',monospace; font-size:clamp(1.5rem,6vw,3rem);
   color:var(--gold); text-shadow:4px 4px 0 var(--black);
   transform:scale(.5); opacity:0;
+  min-width:0; max-width:90vw; text-align:center;
 }
 #levelup-flash.play span{ animation:textpop .9s ease forwards; }
 @keyframes flashpop{
